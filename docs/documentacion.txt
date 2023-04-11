@@ -1,0 +1,6 @@
+Ctrl + Shift + P --> Crear proyecto de flutter
+
+Modelo para app https://dribbble.com/shots/6540871-Pokedex-App
+
+Lista de pokemons https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json
+
