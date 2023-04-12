@@ -1,9 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pokedex/models/HomeScreenController.dart';
 import 'package:flutter_pokedex/pages/DetailsScreen.dart';
+import 'package:get/get.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatefulWidget { 
+  
+  HomeScreenController homeScreenController = Get.put(HomeScreenController());
+
+  
 
   @override
   State<HomeScreen> createState() => HomeScreenState();
@@ -99,8 +104,7 @@ class HomeScreenState extends State<HomeScreen> {
     return Positioned(
       bottom: 0,
       right: 0,      
-      child: Image.asset('images/pokeball.png',
-          height: 85, fit: BoxFit.fitHeight),
+      child: Image.asset('images/pokeball.png', height: 85, fit: BoxFit.fitHeight),
     );
   }
 
