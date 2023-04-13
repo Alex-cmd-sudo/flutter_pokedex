@@ -4,34 +4,45 @@ import 'package:flutter_pokedex/models/HomeScreenController.dart';
 import 'package:flutter_pokedex/pages/DetailsScreen.dart';
 import 'package:get/get.dart';
 
-class HomeScreen extends StatefulWidget { 
-  
-  HomeScreenController homeScreenController = Get.put(HomeScreenController());
+import '../controller/GetDataController.dart';
 
-  
+class HomeScreen extends StatefulWidget {  
 
   @override
   State<HomeScreen> createState() => HomeScreenState();
 }
 
 class HomeScreenState extends State<HomeScreen> {
+
+  final getDataController = Get.put(GetDataController());
+
+  @override
+  void initState(){
+    getDataController.getDataFromFirebase();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return Obx(() => SafeArea(
         child: Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [_ImageBackground(), _TextTittle(), _DataApp(context)],
-      ),
-    ));
+        backgroundColor: Colors.white,
+        body: !getDataController.isLoading.value ?
+        Stack(
+          children: [_ImageBackground(), _TextTittle(), _DataApp(context)],
+        ) 
+        : Center(
+        child: CircularProgressIndicator(),
+        ),
+    )));
   }
 
   Widget _ImageBackground() {
     return Positioned(
-      top: 10,
-      right: 5,
-      width: 150,
-      child: Image.asset('images/icon.png', fit: BoxFit.fitWidth, width: 200),
+      top: 30,
+      right: 15,
+      width: 100,
+      child: Image.asset('images/icon.png', fit: BoxFit.fitWidth),
     );
   }
 
@@ -43,16 +54,19 @@ class HomeScreenState extends State<HomeScreen> {
             style: TextStyle(
                 color: Colors.red.withOpacity(0.9),
                 fontWeight: FontWeight.bold,
-                fontSize: 30)));
+                fontSize: 30
+            )
+        )
+    );
   }
 
   Widget _DataApp(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
+    //var width = MediaQuery.of(context).size.width;
 
     return Positioned(
-        top: 170,
+        top: 150,
         bottom: 0,
-        width: width,
+        width: MediaQuery.of(context).size.width,
         child: Column(
           children: [
             Expanded(
@@ -60,7 +74,7 @@ class HomeScreenState extends State<HomeScreen> {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2, childAspectRatio: 1.4),
-                    itemCount: 152,
+                    itemCount: getDataController.getDataModel.value.pokemon.length,
                     shrinkWrap: true,
                     physics: BouncingScrollPhysics(),
                     scrollDirection: Axis.vertical,
@@ -72,16 +86,18 @@ class HomeScreenState extends State<HomeScreen> {
                           child: SafeArea(
                               child: Container(
                             margin: const EdgeInsets.only(left: 5, right: 5),
-                            decoration: const BoxDecoration(
+                            decoration:  BoxDecoration(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(25)),
-                                color: Colors.greenAccent),
+                                color: getDataController.colorBoxPokemon(getDataController.getDataModel.value.pokemon[index].type[0].toString())),
                             child: Stack(
                               children: [
                                 _ImageDefault(),
                                 _ImagePokemon(index),
-                                _NamePokemon(),
-                                _TypePokemon()
+                                _NamePokemon(index),                                        
+                                _TypePokemonOne(index)
+                                //_TypePokemon(index)
+                                
                               ],
                             ),
                           )
@@ -89,7 +105,16 @@ class HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           Navigator.push(
                             context, MaterialPageRoute(
-                              builder: (_)=> DetailsScreen( heroTag: index) 
+                              builder: (_)=> DetailsScreen( 
+                                heroTag: index,
+                                wPokeName: getDataController.getDataModel.value.pokemon[index].name,
+                                wPokeTipo: getDataController.getDataModel.value.pokemon[index].type,
+                                wPokeNum: getDataController.getDataModel.value.pokemon[index].num,
+                                wPokeImg: getDataController.getDataModel.value.pokemon[index].img,
+                                wPokeHeight: getDataController.getDataModel.value.pokemon[index].height,
+                                wPokeWeight: getDataController.getDataModel.value.pokemon[index].weight,
+                                wPokeColorBox: getDataController.colorBoxPokemon(getDataController.getDataModel.value.pokemon[index].type[0].toString())
+                              ) 
                             )
                           );
                         },
@@ -111,12 +136,12 @@ class HomeScreenState extends State<HomeScreen> {
   Widget _ImagePokemon(index) {
     return Positioned(
         bottom: 0,
-        right: 0,
+        right: 3,
         child: Hero(
           tag: index,
           child: CachedNetworkImage(
-            imageUrl: 'http://www.serebii.net/pokemongo/pokemon/094.png',
-            height: 80,
+            imageUrl: getDataController.getDataModel.value.pokemon[index].img,
+            height: 90,
             fit: BoxFit.fitHeight,
             placeholder: ((context, url) => Center(
                   child: CircularProgressIndicator(),
@@ -126,12 +151,12 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _NamePokemon(){
+  Widget _NamePokemon(index){
     return Positioned(
       top: 20,
       left: 10,
       child: Text(
-        "Gengar",
+        getDataController.getDataModel.value.pokemon[index].name,
         style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 15,
@@ -141,33 +166,66 @@ class HomeScreenState extends State<HomeScreen> {
       );
   }
 
-  Widget _TypePokemon(){
-    return Positioned(
-      top: 60,
-      left: 15,
-      child: Container(
-        child: Padding(
-          padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
-          child: Text(
-              "Fantasma",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                shadows: [
-                  BoxShadow(
-                    color: Colors.blueGrey,
-                    offset: Offset(0, 0)
-                  )
-                ]
+  Widget _TypePokemonOne(index){
+
+        return Positioned(
+        top: 60,
+        left: 15,
+        child: Container(
+          child: Padding(
+            padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+            child: Text(
+                getDataController.getDataModel.value.pokemon[index].type[0].toString().replaceAll("Type.", ""),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  shadows: [
+                    const BoxShadow(
+                      color: Colors.blueGrey,
+                      offset: Offset(0, 0)
+                    )
+                  ]
+                ),
               ),
             ),
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-            color: Colors.black.withOpacity(0.5)
-          ),
-      )
-    );
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(20)),
+              color: Colors.black.withOpacity(0.5)
+            ),
+        )
+      ); 
+    
+  }
+
+    Widget _TypePokemonTwo(index){
+
+        return Positioned(
+        top: 80,
+        left: 15,
+        child: Container(
+          child: Padding(
+            padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+            child: Text(
+                getDataController.getDataModel.value.pokemon[index].type[1].toString().replaceAll("Type.", ""),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  shadows: [
+                    const BoxShadow(
+                      color: Colors.blueGrey,
+                      offset: Offset(0, 0)
+                    )
+                  ]
+                ),
+              ),
+            ),
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(20)),
+              color: Colors.black.withOpacity(0.5)
+            ),
+        )
+      ); 
+    
   }
 
 }

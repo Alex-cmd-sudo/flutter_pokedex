@@ -3,8 +3,15 @@ import 'package:flutter/material.dart';
 
 class DetailsScreen extends StatefulWidget {
   final heroTag;
+  final wPokeName;
+  final wPokeTipo;
+  final wPokeNum;
+  final wPokeImg;
+  final wPokeHeight;
+  final wPokeWeight;
+  final wPokeColorBox;
 
-  const DetailsScreen({super.key, this.heroTag});
+  const DetailsScreen({super.key, this.heroTag, this.wPokeName, this.wPokeTipo, this.wPokeNum, this.wPokeImg, this.wPokeHeight, this.wPokeWeight, this.wPokeColorBox});
 
   @override
   State<DetailsScreen> createState() => _nameState();
@@ -18,14 +25,13 @@ class _nameState extends State<DetailsScreen> {
 
     return SafeArea(
         child: Scaffold(
-      backgroundColor: Colors.greenAccent,
+      backgroundColor: widget.wPokeColorBox,
       body: Stack(
         alignment: Alignment.center,
-        children: [
-          _arrowBack(),
-          _nameNumberPokemon(),
+        children: [          
+          _nameNumberPokemon(),          
           _typePokemon(),
-          _backgroundPokeball(),
+          _backgroundPokeball(),          
           Positioned(
               bottom: 0,
               child: Container(
@@ -57,7 +63,7 @@ class _nameState extends State<DetailsScreen> {
                             Container(
                               width: widthScreen * 0.3,
                               child: Text(
-                                "55555",
+                                widget.wPokeHeight.toString(),
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
@@ -78,7 +84,7 @@ class _nameState extends State<DetailsScreen> {
                             Container(
                               width: widthScreen * 0.3,
                               child: Text(
-                                "4444",
+                                widget.wPokeWeight.toString(),
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
@@ -94,12 +100,13 @@ class _nameState extends State<DetailsScreen> {
             child: Hero(
               tag: widget.heroTag,
               child: CachedNetworkImage(
-                  imageUrl: 'http://www.serebii.net/pokemongo/pokemon/094.png',
+                  imageUrl: widget.wPokeImg,
                   height: 200,
                   width: 200,
-                  fit: BoxFit.cover),
+                  fit: BoxFit.contain),
             ),
           ),
+          _arrowBack(),
         ],
       ),
     ));
@@ -129,13 +136,13 @@ class _nameState extends State<DetailsScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Nombre",
+              widget.wPokeName.toString(),
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 30,
                   fontWeight: FontWeight.bold),
             ),
-            Text("#" + "00",
+            Text("#" + widget.wPokeNum,
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -152,7 +159,7 @@ class _nameState extends State<DetailsScreen> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              "Fantasma",
+              widget.wPokeTipo.toString(),
               style: TextStyle(color: Colors.white, fontSize: 15),
             ),
           ),

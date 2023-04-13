@@ -4,3 +4,5 @@ Modelo para app https://dribbble.com/shots/6540871-Pokedex-App
 
 Lista de pokemons https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json
 
+Mas de pokemon https://www.unpkg.com/pokemons@1.1.0/pokemons.json
+
